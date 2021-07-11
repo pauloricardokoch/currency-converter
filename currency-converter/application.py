@@ -14,10 +14,10 @@ def create_app() -> FastAPI:
     db = container.db()
     db.create_database()
 
-    app = FastAPI()
-    app.container = container
-    app.include_router(endpoints.router)
-    return app
+    fastapi_app = FastAPI()
+    fastapi_app.container = container
+    fastapi_app.include_router(endpoints.currency_router)
+    return fastapi_app
 
 
 app = create_app()

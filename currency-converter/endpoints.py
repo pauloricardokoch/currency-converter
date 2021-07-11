@@ -1,5 +1,7 @@
 """Endpoints module."""
 
+from typing import Optional, List
+
 from dependency_injector.wiring import inject, Provide
 from fastapi import APIRouter, Depends, Response, status
 from pydantic import BaseModel, constr
@@ -10,15 +12,19 @@ from .services import CurrencyService
 
 
 class Currency(BaseModel):
-    abb = constr(regex='^[A-Z]{3}$')
-    name = str
-    id = int
+    abb: constr(regex='^[A-Z]{3}$')
+    name: str
+    id: int
 
 
-router = APIRouter()
+class CurrencyList(BaseModel):
+    currencies: Optional[List[Currency]]
 
 
-@router.get('/currencies')
+currency_router = APIRouter(tags=['currency'])
+
+
+@currency_router.get('/currencies', response_model=CurrencyList)
 @inject
 def get_list(
         currency_service: CurrencyService = Depends(Provide[Container.currency_service]),
@@ -26,7 +32,7 @@ def get_list(
     return currency_service.get_currencies()
 
 
-@router.get('/currencies/{currency_id}')
+@currency_router.get('/currencies/{currency_id}', response_model=Currency)
 @inject
 def get_by_id(
         currency_id: int,
@@ -38,7 +44,7 @@ def get_by_id(
         return Response(status_code=status.HTTP_404_NOT_FOUND)
 
 
-@router.post('/currencies', status_code=status.HTTP_201_CREATED)
+@currency_router.post('/currencies', status_code=status.HTTP_201_CREATED)
 @inject
 def add(
         currency: Currency,
@@ -47,7 +53,7 @@ def add(
     return currency_service.create_currency(currency.abb, currency.name)
 
 
-@router.delete('/currencies/{currency_id}', status_code=status.HTTP_204_NO_CONTENT)
+@currency_router.delete('/currencies/{currency_id}', status_code=status.HTTP_204_NO_CONTENT)
 @inject
 def remove(
         currency_id: int,
@@ -61,6 +67,6 @@ def remove(
         return Response(status_code=status.HTTP_204_NO_CONTENT)
 
 
-@router.get('/status')
+@currency_router.get('/status')
 def get_status():
     return {'status': 'OK'}
