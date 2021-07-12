@@ -10,7 +10,7 @@ from fastapi.responses import PlainTextResponse
 from .containers import Container
 from .dtos import CurrencyIn, CurrencyOut, CurrencyQuotationIn, CurrencyQuotationOut, ConverterIn, ConverterOut
 from .repositories import NotFoundError, DataBaseIntegrityError
-from .services import CurrencyService, CurrencyQuotationService
+from .services import CurrencyService, CurrencyQuotationService, CurrencyConverterService
 
 currency_router = APIRouter(tags=['currency'])
 quotation_router = APIRouter(tags=['currency_quotation'])
@@ -149,12 +149,12 @@ def remove(
 @converter_router.post('/converter', response_model=ConverterOut)
 @inject
 def converter(
-        converter: ConverterIn,
-        currency_quotation_service: CurrencyQuotationService = Depends(
-            Provide[Container.currency_quotation_service]),
+        converter_in: ConverterIn,
+        currency_converter_service: CurrencyConverterService = Depends(
+            Provide[Container.currency_converter_service]),
 ):
     try:
-        return currency_quotation_service.convert_currency(converter)
+        return currency_converter_service.convert_currency(converter_in)
     except DataBaseIntegrityError as e:
         return PlainTextResponse(str(e), status_code=status.HTTP_400_BAD_REQUEST)
     except Exception as e:

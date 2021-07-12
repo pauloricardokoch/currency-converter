@@ -144,4 +144,4 @@ class NotFoundError(Exception):
 
 class DataBaseIntegrityError(Exception):
     def __init__(self, e: IntegrityError):
-        super().__init__(f'DatabaseIntegrityError: {e.__cause__}')
+            super().__init__(f'DatabaseIntegrityError: {e.__cause__}')

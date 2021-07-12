@@ -78,27 +78,29 @@ class CurrencyQuotationService:
     def delete_currency_quotation_by_id(self, currency_id: int, quotation_id: int) -> None:
         return self._repository.delete_by_id(currency_id, quotation_id)
 
+
+class CurrencyConverterService:
+    def __init__(self, currency_quotation_repository: CurrencyQuotationRepository) -> None:
+        self._repository: CurrencyQuotationRepository = currency_quotation_repository
+
+    def _get_quotation(self, currency_id: int, date: Optional[datetime.date]):
+        quotation = self._repository.get_by_id_and_date(currency_id, date)
+        return CurrencyQuotationOut(id=quotation.id,
+                                    currency_id=quotation.currency_id,
+                                    exchange_rate=quotation.exchange_rate,
+                                    date=quotation.date)
+
     def _get_quotation_from(self, currency_id: int, date: Optional[datetime.date]):
         try:
-            quotation_from = self._repository.get_by_id_and_date(currency_id, date)
+            return self._get_quotation(currency_id, date)
         except NotFoundError:
             raise Exception('QuotationFrom not found in the database')
 
-        return CurrencyQuotationOut(id=quotation_from.id,
-                                    currency_id=quotation_from.currency_id,
-                                    exchange_rate=quotation_from.exchange_rate,
-                                    date=quotation_from.date)
-
     def _get_quotation_to(self, currency_id: int, date: Optional[datetime.date]):
         try:
-            quotation_to = self._repository.get_by_id_and_date(currency_id, date)
+            return self._get_quotation(currency_id, date)
         except NotFoundError:
             raise Exception('QuotationTo not found in the database')
-
-        return CurrencyQuotationOut(id=quotation_to.id,
-                                    currency_id=quotation_to.currency_id,
-                                    exchange_rate=quotation_to.exchange_rate,
-                                    date=quotation_to.date)
 
     def convert_currency(self, converter: ConverterIn) -> ConverterOut:
         quotation_from = self._get_quotation_from(converter.currency_id_from, converter.date)
