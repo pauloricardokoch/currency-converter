@@ -1,4 +1,4 @@
 venv
 .idea
-currency-converter.db
+currency-converter.sqlite
 __pycache__
