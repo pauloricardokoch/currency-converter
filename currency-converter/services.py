@@ -82,7 +82,7 @@ class CurrencyQuotationService:
         try:
             quotation_from = self._repository.get_by_id_and_date(converter.currency_id_from, converter.date)
         except NotFoundError:
-            raise Exception('Quotation from not found in the database')
+            raise Exception('QuotationFrom not found in the database')
 
         quotation_from = CurrencyQuotationOut(id=quotation_from.id,
                                               currency_id=quotation_from.currency_id,
@@ -92,7 +92,7 @@ class CurrencyQuotationService:
         try:
             quotation_to = self._repository.get_by_id_and_date(converter.currency_id_to, converter.date)
         except NotFoundError:
-            raise Exception('Quotation to not found in the database')
+            raise Exception('QuotationTo not found in the database')
 
         quotation_to = CurrencyQuotationOut(id=quotation_to.id,
                                             currency_id=quotation_to.currency_id,
