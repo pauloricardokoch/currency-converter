@@ -16,5 +16,5 @@ docker-compose up
 
 
 #### TODO
-[ ] CD / Deploy on heroku
-[ ] Write tests / CI
+- [ ] CD / Deploy on heroku
+- [ ] Write tests / CI
