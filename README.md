@@ -13,3 +13,8 @@ docker-compose up
 
 ### API
 (http://localhost:8000/docs)
+
+
+#### TODO
+[ ] CD / Deploy on heroku
+[ ] Write tests / CI
