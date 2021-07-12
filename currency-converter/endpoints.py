@@ -3,6 +3,7 @@
 from typing import Optional, List
 
 from dependency_injector.wiring import inject, Provide
+
 from fastapi import APIRouter, Depends, Response, status
 from fastapi.responses import PlainTextResponse
 

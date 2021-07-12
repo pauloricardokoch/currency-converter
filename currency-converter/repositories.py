@@ -1,6 +1,7 @@
 """Repositories module."""
 
 from contextlib import AbstractContextManager
+
 from datetime import date, datetime
 from typing import Callable, Iterator, Optional
 
