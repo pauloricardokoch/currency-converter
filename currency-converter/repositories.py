@@ -1,7 +1,6 @@
 """Repositories module."""
 
 from contextlib import AbstractContextManager
-
 from datetime import date, datetime
 from typing import Callable, Iterator, Optional
 
@@ -83,21 +82,27 @@ class CurrencyQuotationRepository:
 
             return currency_quotation
 
-    def get_by_id_and_date(self, currency_id: int,
+    def get_by_id_and_date(self, currency_abb: str,
                            date: Optional[date] = None) -> CurrencyQuotation:
         with self.session_factory() as session:
-            res = session.query(CurrencyQuotation)
-            res = res.filter(CurrencyQuotation.currency_id == currency_id)
+            res = session.query(CurrencyQuotation, Currency) \
+                .join(Currency, Currency.id == CurrencyQuotation.currency_id)
+            res = res.filter(Currency.abb == currency_abb)
 
             if date is not None:
                 res = res.filter(CurrencyQuotation.date <= date)
 
-            currency_quotation = res.order_by(desc(CurrencyQuotation.date)).limit(1).first()
+            res = res.order_by(desc(CurrencyQuotation.date)).limit(1).first()
 
-            if currency_quotation is None:
+            if res is None:
                 raise NotFoundError(CurrencyQuotationRepository.__name__)
 
-            return currency_quotation
+            return CurrencyQuotation(
+                id=res.CurrencyQuotation.id,
+                currency_id=res.CurrencyQuotation.currency_id,
+                exchange_rate=res.CurrencyQuotation.exchange_rate,
+                date=res.CurrencyQuotation.date,
+            )
 
     def add(self, currency_id: int, currency_quotation: CurrencyQuotationIn) -> CurrencyQuotation:
         with self.session_factory() as session:
@@ -144,4 +149,4 @@ class NotFoundError(Exception):
 
 class DataBaseIntegrityError(Exception):
     def __init__(self, e: IntegrityError):
-            super().__init__(f'DatabaseIntegrityError: {e.__cause__}')
+        super().__init__(f'DatabaseIntegrityError: {e.__cause__}')

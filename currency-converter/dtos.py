@@ -28,8 +28,8 @@ class CurrencyQuotationOut(BaseModel):
 
 
 class ConverterIn(BaseModel):
-    currency_id_from: int
-    currency_id_to: int
+    currency_abb_from: constr(regex='^[A-Z]{3}$')
+    currency_abb_to: constr(regex='^[A-Z]{3}$')
     date: Optional[date]
     value: float
 

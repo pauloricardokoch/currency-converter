@@ -83,28 +83,28 @@ class CurrencyConverterService:
     def __init__(self, currency_quotation_repository: CurrencyQuotationRepository) -> None:
         self._repository: CurrencyQuotationRepository = currency_quotation_repository
 
-    def _get_quotation(self, currency_id: int, date: Optional[datetime.date]):
-        quotation = self._repository.get_by_id_and_date(currency_id, date)
+    def _get_quotation(self, currency_abb: str, date: Optional[datetime.date]):
+        quotation = self._repository.get_by_id_and_date(currency_abb, date)
         return CurrencyQuotationOut(id=quotation.id,
                                     currency_id=quotation.currency_id,
                                     exchange_rate=quotation.exchange_rate,
                                     date=quotation.date)
 
-    def _get_quotation_from(self, currency_id: int, date: Optional[datetime.date]):
+    def _get_quotation_from(self, currency_abb: str, date: Optional[datetime.date]):
         try:
-            return self._get_quotation(currency_id, date)
+            return self._get_quotation(currency_abb, date)
         except NotFoundError:
             raise Exception('QuotationFrom not found in the database')
 
-    def _get_quotation_to(self, currency_id: int, date: Optional[datetime.date]):
+    def _get_quotation_to(self, currency_abb: str, date: Optional[datetime.date]):
         try:
-            return self._get_quotation(currency_id, date)
+            return self._get_quotation(currency_abb, date)
         except NotFoundError:
             raise Exception('QuotationTo not found in the database')
 
     def convert_currency(self, converter: ConverterIn) -> ConverterOut:
-        quotation_from = self._get_quotation_from(converter.currency_id_from, converter.date)
-        quotation_to = self._get_quotation_to(converter.currency_id_to, converter.date)
+        quotation_from = self._get_quotation_from(converter.currency_abb_from, converter.date)
+        quotation_to = self._get_quotation_to(converter.currency_abb_to, converter.date)
 
         value = converter.value * quotation_from.exchange_rate / quotation_to.exchange_rate
 
