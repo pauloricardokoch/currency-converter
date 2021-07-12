@@ -44,11 +44,7 @@ class CurrencyRepository:
 
     def update_by_id(self, currency_id: int, currency: CurrencyIn) -> Currency:
         with self.session_factory() as session:
-            entity: Currency = session.query(Currency).filter(Currency.id == currency_id).first()
-
-            if not entity:
-                raise NotFoundError(CurrencyRepository.__name__)
-
+            entity: Currency = self.get_by_id(currency_id)
             entity.abb = currency.abb
             entity.name = currency.name
 
@@ -63,11 +59,7 @@ class CurrencyRepository:
 
     def delete_by_id(self, currency_id: int) -> None:
         with self.session_factory() as session:
-            entity: Currency = session.query(Currency).filter(Currency.id == currency_id).first()
-
-            if not entity:
-                raise NotFoundError(CurrencyRepository.__name__)
-
+            entity: Currency = self.get_by_id(currency_id)
             session.delete(entity)
             session.commit()
 
@@ -125,12 +117,7 @@ class CurrencyQuotationRepository:
     def update_by_id(self, currency_id: int, quotation_id: int,
                      currency_quotation: CurrencyQuotationIn) -> CurrencyQuotation:
         with self.session_factory() as session:
-            entity: CurrencyQuotation = session.query(CurrencyQuotation).filter(
-                CurrencyQuotation.currency_id == currency_id, CurrencyQuotation.id == quotation_id).first()
-
-            if not entity:
-                raise NotFoundError(CurrencyQuotationRepository.__name__)
-
+            entity: CurrencyQuotation = self.get_by_id(currency_id, quotation_id)
             entity.date = currency_quotation.date or f'{datetime.now():%Y-%m-%d}'
             entity.exchange_rate = currency_quotation.exchange_rate
 
@@ -145,12 +132,7 @@ class CurrencyQuotationRepository:
 
     def delete_by_id(self, currency_id: int, quotation_id: int) -> None:
         with self.session_factory() as session:
-            entity: CurrencyQuotation = session.query(CurrencyQuotation).filter(
-                CurrencyQuotation.currency_id == currency_id, CurrencyQuotation.id == quotation_id).first()
-
-            if not entity:
-                raise NotFoundError(CurrencyQuotationRepository.__name__)
-
+            entity: CurrencyQuotation = self.get_by_id(currency_id, quotation_id)
             session.delete(entity)
             session.commit()
 
