@@ -2,9 +2,9 @@ version: "3.7"
 
 services:
 
-  webapp:
+  currency-conv:
     build: ./
-    image: currency-converter
+    image: currency-conv
     ports:
       - "8000:8000"
     volumes:
