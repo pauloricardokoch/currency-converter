@@ -16,6 +16,7 @@ docker-compose up
 
 
 #### TODO
+- [ ] Add PEP8 checker
 - [ ] Write tests / CI
 - [ ] Implement migrations
 - [ ] CD / Deploy on heroku
