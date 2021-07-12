@@ -117,9 +117,11 @@ class CurrencyQuotationRepository:
 
     def add(self, currency_id: int, currency_quotation: CurrencyQuotationIn) -> CurrencyQuotation:
         with self.session_factory() as session:
-            currency_quotation = CurrencyQuotation(currency_id=currency_id,
-                                                   exchange_rate=currency_quotation.exchange_rate,
-                                                   date=currency_quotation.date or f'{datetime.now():%Y-%m-%d}')
+            currency_quotation = CurrencyQuotation(
+                currency_id=currency_id,
+                exchange_rate=currency_quotation.exchange_rate,
+                date=currency_quotation.date or f'{datetime.now():%Y-%m-%d}'
+            )
 
             try:
                 session.add(currency_quotation)
