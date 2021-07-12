@@ -22,7 +22,9 @@ class CurrencyRepository:
 
     def get_by_id(self, currency_id: int) -> Currency:
         with self.session_factory() as session:
-            currency = session.query(Currency).filter(Currency.id == currency_id).first()
+            currency = session.query(Currency) \
+                .filter(Currency.id == currency_id) \
+                .first()
 
             if not currency:
                 raise NotFoundError(CurrencyRepository.__name__)
@@ -70,12 +72,15 @@ class CurrencyQuotationRepository:
 
     def get_all(self, currency_id: int) -> Iterator[CurrencyQuotation]:
         with self.session_factory() as session:
-            return session.query(CurrencyQuotation).filter(CurrencyQuotation.currency_id == currency_id).all()
+            return session.query(CurrencyQuotation) \
+                .filter(CurrencyQuotation.currency_id == currency_id) \
+                .all()
 
     def get_by_id(self, currency_id: int, quotation_id: int) -> CurrencyQuotation:
         with self.session_factory() as session:
-            currency_quotation = session.query(CurrencyQuotation).filter(
-                CurrencyQuotation.currency_id == currency_id, CurrencyQuotation.id == quotation_id).first()
+            currency_quotation = session.query(CurrencyQuotation) \
+                .filter(CurrencyQuotation.currency_id == currency_id, CurrencyQuotation.id == quotation_id) \
+                .first()
 
             if not currency_quotation:
                 raise NotFoundError(CurrencyQuotationRepository.__name__)
@@ -87,12 +92,15 @@ class CurrencyQuotationRepository:
         with self.session_factory() as session:
             res = session.query(CurrencyQuotation, Currency) \
                 .join(Currency, Currency.id == CurrencyQuotation.currency_id)
+
             res = res.filter(Currency.abb == currency_abb)
 
             if date is not None:
                 res = res.filter(CurrencyQuotation.date <= date)
 
-            res = res.order_by(desc(CurrencyQuotation.date)).limit(1).first()
+            res = res.order_by(desc(CurrencyQuotation.date)) \
+                .limit(1) \
+                .first()
 
             if res is None:
                 raise NotFoundError(CurrencyQuotationRepository.__name__)

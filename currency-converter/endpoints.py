@@ -3,7 +3,6 @@
 from typing import Optional, List
 
 from dependency_injector.wiring import inject, Provide
-
 from fastapi import APIRouter, Depends, Response, status
 from fastapi.responses import PlainTextResponse
 
@@ -101,8 +100,10 @@ def get_by_id(
         return Response(status_code=status.HTTP_404_NOT_FOUND)
 
 
-@quotation_router.post('/currencies/{currency_id}/quotations', status_code=status.HTTP_201_CREATED,
-                       response_model=CurrencyQuotationOut)
+@quotation_router.post(
+    '/currencies/{currency_id}/quotations', status_code=status.HTTP_201_CREATED,
+    response_model=CurrencyQuotationOut
+)
 @inject
 def add(
         currency_id: int,

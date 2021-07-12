@@ -41,39 +41,48 @@ class CurrencyQuotationService:
 
     def get_currency_quotations(self, currency_id: int) -> Iterator[CurrencyQuotationOut]:
         currency_quotations = map(
-            lambda currency_quotation: CurrencyQuotationOut(id=currency_quotation.id,
-                                                            currency_id=currency_quotation.currency_id,
-                                                            exchange_rate=currency_quotation.exchange_rate,
-                                                            date=currency_quotation.date),
-            self._repository.get_all(currency_id))
+            lambda currency_quotation: CurrencyQuotationOut(
+                id=currency_quotation.id,
+                currency_id=currency_quotation.currency_id,
+                exchange_rate=currency_quotation.exchange_rate,
+                date=currency_quotation.date
+            ),
+            self._repository.get_all(currency_id)
+        )
 
         return list(currency_quotations)
 
     def get_currency_quotation_by_id(self, currency_id: int, quotation_id: int) -> CurrencyQuotationOut:
         currency_quotation = self._repository.get_by_id(currency_id, quotation_id)
 
-        return CurrencyQuotationOut(id=currency_quotation.id,
-                                    currency_id=currency_quotation.currency_id,
-                                    exchange_rate=currency_quotation.exchange_rate,
-                                    date=currency_quotation.date)
+        return CurrencyQuotationOut(
+            id=currency_quotation.id,
+            currency_id=currency_quotation.currency_id,
+            exchange_rate=currency_quotation.exchange_rate,
+            date=currency_quotation.date
+        )
 
     def create_currency_quotation(self, currency_id: int,
                                   currency_quotation: CurrencyQuotationIn) -> CurrencyQuotationOut:
         currency_quotation = self._repository.add(currency_id, currency_quotation)
 
-        return CurrencyQuotationOut(id=currency_quotation.id,
-                                    currency_id=currency_quotation.currency_id,
-                                    exchange_rate=currency_quotation.exchange_rate,
-                                    date=currency_quotation.date)
+        return CurrencyQuotationOut(
+            id=currency_quotation.id,
+            currency_id=currency_quotation.currency_id,
+            exchange_rate=currency_quotation.exchange_rate,
+            date=currency_quotation.date
+        )
 
     def update_currency_quotation(self, currency_id: int, quotation_id: int,
                                   currency_quotation: CurrencyQuotationIn) -> CurrencyQuotationOut:
         currency_quotation = self._repository.update_by_id(currency_id, quotation_id, currency_quotation)
 
-        return CurrencyQuotationOut(id=currency_quotation.id,
-                                    currency_id=currency_quotation.currency_id,
-                                    exchange_rate=currency_quotation.exchange_rate,
-                                    date=currency_quotation.date)
+        return CurrencyQuotationOut(
+            id=currency_quotation.id,
+            currency_id=currency_quotation.currency_id,
+            exchange_rate=currency_quotation.exchange_rate,
+            date=currency_quotation.date
+        )
 
     def delete_currency_quotation_by_id(self, currency_id: int, quotation_id: int) -> None:
         return self._repository.delete_by_id(currency_id, quotation_id)
@@ -85,10 +94,13 @@ class CurrencyConverterService:
 
     def _get_quotation(self, currency_abb: str, date: Optional[datetime.date]):
         quotation = self._repository.get_by_abb_and_date(currency_abb, date)
-        return CurrencyQuotationOut(id=quotation.id,
-                                    currency_id=quotation.currency_id,
-                                    exchange_rate=quotation.exchange_rate,
-                                    date=quotation.date)
+
+        return CurrencyQuotationOut(
+            id=quotation.id,
+            currency_id=quotation.currency_id,
+            exchange_rate=quotation.exchange_rate,
+            date=quotation.date
+        )
 
     def _get_quotation_from(self, currency_abb: str, date: Optional[datetime.date]):
         try:
@@ -108,5 +120,8 @@ class CurrencyConverterService:
 
         value = converter.value * quotation_from.exchange_rate / quotation_to.exchange_rate
 
-        return ConverterOut(CurrencyQuotationFrom=quotation_from, CurrencyQuotationTo=quotation_to,
-                            value=value)
+        return ConverterOut(
+            CurrencyQuotationFrom=quotation_from,
+            CurrencyQuotationTo=quotation_to,
+            value=value
+        )
