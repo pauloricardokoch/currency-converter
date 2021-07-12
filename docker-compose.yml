@@ -4,6 +4,8 @@ services:
 
   currency-conv:
     build: ./
+    environment:
+      TZ: "America/Sao_Paulo"
     image: currency-conv
     ports:
       - "8000:8000"

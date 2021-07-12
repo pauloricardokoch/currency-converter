@@ -7,7 +7,7 @@ from fastapi import APIRouter, Depends, Response, status
 from fastapi.responses import PlainTextResponse
 
 from .containers import Container
-from .dtos import CurrencyIn, CurrencyOut, CurrencyQuotationIn, CurrencyQuotationOut
+from .dtos import CurrencyIn, CurrencyOut, CurrencyQuotationIn, CurrencyQuotationOut, ConverterIn, ConverterOut
 from .repositories import NotFoundError, DataBaseIntegrityError
 from .services import CurrencyService, CurrencyQuotationService
 
@@ -57,7 +57,7 @@ def update(
     try:
         return currency_service.update_currency(currency_id, currency)
     except DataBaseIntegrityError as e:
-        return PlainTextResponse(str(e), status_code=400)
+        return PlainTextResponse(str(e), status_code=status.HTTP_400_BAD_REQUEST)
     except NotFoundError:
         return Response(status_code=status.HTTP_404_NOT_FOUND)
 
@@ -110,32 +110,50 @@ def add(
     try:
         return currency_quotation_service.create_currency_quotation(currency_id, currency_quotation)
     except DataBaseIntegrityError as e:
-        return PlainTextResponse(str(e), status_code=400)
+        return PlainTextResponse(str(e), status_code=status.HTTP_400_BAD_REQUEST)
 
-# @quotation_router.put('/currencies/{currency_id}', response_model=CurrencyOut)
-# @inject
-# def update(
-#         currency_id: int,
-#         currency: CurrencyIn,
-#         currency_service: CurrencyService = Depends(Provide[Container.currency_service]),
-# ):
-#     try:
-#         return currency_service.update_currency(currency_id, currency)
-#     except DataBaseIntegrityError as e:
-#         return PlainTextResponse(str(e), status_code=400)
-#     except NotFoundError:
-#         return Response(status_code=status.HTTP_404_NOT_FOUND)
-#
-#
-# @quotation_router.delete('/currencies/{currency_id}', status_code=status.HTTP_204_NO_CONTENT)
-# @inject
-# def remove(
-#         currency_id: int,
-#         currency_service: CurrencyService = Depends(Provide[Container.currency_service]),
-# ):
-#     try:
-#         currency_service.delete_currency_by_id(currency_id)
-#     except NotFoundError:
-#         return Response(status_code=status.HTTP_404_NOT_FOUND)
-#     else:
-#         return Response(status_code=status.HTTP_204_NO_CONTENT)
+
+@quotation_router.put('/currencies/{currency_id}/quotations', response_model=CurrencyQuotationOut)
+@inject
+def update(
+        currency_id: int,
+        quotation_id: int,
+        currency_quotation: CurrencyQuotationIn,
+        currency_quotation_service: CurrencyQuotationService = Depends(Provide[Container.currency_quotation_service]),
+):
+    try:
+        return currency_quotation_service.update_currency_quotation(currency_id, quotation_id, currency_quotation)
+    except DataBaseIntegrityError as e:
+        return PlainTextResponse(str(e), status_code=status.HTTP_400_BAD_REQUEST)
+    except NotFoundError:
+        return Response(status_code=status.HTTP_404_NOT_FOUND)
+
+
+@quotation_router.delete('/currencies/{currency_id}/quotations', status_code=status.HTTP_204_NO_CONTENT)
+@inject
+def remove(
+        currency_id: int,
+        quotation_id: int,
+        currency_quotation_service: CurrencyQuotationService = Depends(Provide[Container.currency_quotation_service]),
+):
+    try:
+        currency_quotation_service.delete_currency_quotation_by_id(currency_id, quotation_id)
+    except NotFoundError:
+        return Response(status_code=status.HTTP_404_NOT_FOUND)
+    else:
+        return Response(status_code=status.HTTP_204_NO_CONTENT)
+
+
+@quotation_router.post('/currencies/converter', response_model=ConverterOut)
+@inject
+def converter(
+        converter: ConverterIn,
+        currency_quotation_service: CurrencyQuotationService = Depends(
+            Provide[Container.currency_quotation_service]),
+):
+    try:
+        return currency_quotation_service.convert_currency(converter)
+    except DataBaseIntegrityError as e:
+        return PlainTextResponse(str(e), status_code=status.HTTP_400_BAD_REQUEST)
+    except Exception as e:
+        return PlainTextResponse(str(e), status_code=status.HTTP_404_NOT_FOUND)

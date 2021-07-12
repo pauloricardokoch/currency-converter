@@ -1,9 +1,10 @@
 """Repositories module."""
 
 from contextlib import AbstractContextManager
-from datetime import datetime
-from typing import Callable, Iterator
+from datetime import date, datetime
+from typing import Callable, Iterator, Optional
 
+from sqlalchemy import desc
 from sqlalchemy.exc import IntegrityError
 from sqlalchemy.orm import Session
 
@@ -89,11 +90,28 @@ class CurrencyQuotationRepository:
 
             return currency_quotation
 
+    def get_by_id_and_date(self, currency_id: int,
+                           date: Optional[date] = None) -> CurrencyQuotation:
+        with self.session_factory() as session:
+            res = session.query(CurrencyQuotation)
+
+            res = res.filter(CurrencyQuotation.currency_id == currency_id)
+
+            if date is not None:
+                res = res.filter(CurrencyQuotation.date <= date)
+
+            currency_quotation = res.order_by(desc(CurrencyQuotation.date)).limit(1).first()
+
+            if currency_quotation is None:
+                raise NotFoundError(CurrencyQuotationRepository.__name__)
+
+            return currency_quotation
+
     def add(self, currency_id: int, currency_quotation: CurrencyQuotationIn) -> CurrencyQuotation:
         with self.session_factory() as session:
             currency_quotation = CurrencyQuotation(currency_id=currency_id,
                                                    exchange_rate=currency_quotation.exchange_rate,
-                                                   date=currency_quotation.date or datetime.now())
+                                                   date=currency_quotation.date or f'{datetime.now():%Y-%m-%d}')
 
             try:
                 session.add(currency_quotation)
@@ -104,15 +122,16 @@ class CurrencyQuotationRepository:
             except IntegrityError as e:
                 raise DataBaseIntegrityError(e)
 
-    def update_by_id(self, quotation_id: int, currency_quotation: CurrencyQuotationIn) -> CurrencyQuotation:
+    def update_by_id(self, currency_id: int, quotation_id: int,
+                     currency_quotation: CurrencyQuotationIn) -> CurrencyQuotation:
         with self.session_factory() as session:
             entity: CurrencyQuotation = session.query(CurrencyQuotation).filter(
-                CurrencyQuotation.id == quotation_id).first()
+                CurrencyQuotation.currency_id == currency_id, CurrencyQuotation.id == quotation_id).first()
 
             if not entity:
                 raise NotFoundError(CurrencyQuotationRepository.__name__)
 
-            entity.currency_id = currency_quotation.currency_id
+            entity.date = currency_quotation.date or f'{datetime.now():%Y-%m-%d}'
             entity.exchange_rate = currency_quotation.exchange_rate
 
             try:
@@ -124,9 +143,10 @@ class CurrencyQuotationRepository:
             except IntegrityError as e:
                 raise DataBaseIntegrityError(e)
 
-    def delete_by_id(self, quotation_id: int) -> None:
+    def delete_by_id(self, currency_id: int, quotation_id: int) -> None:
         with self.session_factory() as session:
-            entity: CurrencyQuotation = session.query(Currency).filter(Currency.id == quotation_id).first()
+            entity: CurrencyQuotation = session.query(CurrencyQuotation).filter(
+                CurrencyQuotation.currency_id == currency_id, CurrencyQuotation.id == quotation_id).first()
 
             if not entity:
                 raise NotFoundError(CurrencyQuotationRepository.__name__)

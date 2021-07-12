@@ -1,7 +1,7 @@
-import datetime
+from datetime import date
+from typing import Optional
 
 from pydantic import BaseModel, constr
-from typing import Optional
 
 
 class CurrencyIn(BaseModel):
@@ -17,11 +17,24 @@ class CurrencyOut(BaseModel):
 
 class CurrencyQuotationIn(BaseModel):
     exchange_rate: float
-    date: Optional[datetime.datetime]
+    date: Optional[date]
 
 
 class CurrencyQuotationOut(BaseModel):
     currency_id: int
     exchange_rate: float
-    date: Optional[datetime.datetime]
+    date: Optional[date]
     id: int
+
+
+class ConverterIn(BaseModel):
+    currency_id_from: int
+    currency_id_to: int
+    date: Optional[date]
+    value: float
+
+
+class ConverterOut(BaseModel):
+    CurrencyQuotationFrom: CurrencyQuotationOut
+    CurrencyQuotationTo: CurrencyQuotationOut
+    value: float

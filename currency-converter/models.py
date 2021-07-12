@@ -1,6 +1,6 @@
 """Models module."""
 
-from sqlalchemy import Column, String, Integer, Float, ForeignKeyConstraint, DateTime, UniqueConstraint
+from sqlalchemy import Column, String, Integer, Float, ForeignKeyConstraint, Date, UniqueConstraint
 
 from .database import Base
 
@@ -27,7 +27,7 @@ class CurrencyQuotation(Base):
     id = Column(Integer, primary_key=True)
     currency_id = Column(Integer)
     exchange_rate = Column(Float(precision=3))
-    date = Column(DateTime)
+    date = Column(Date)
 
     def __repr__(self):
         return f'<CurrencyQuotation(id="{self.id}", ' \
