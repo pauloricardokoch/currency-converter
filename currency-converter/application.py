@@ -34,6 +34,7 @@ def create_app() -> FastAPI:
     app.container = container
     app.include_router(endpoints.currency_router)
     app.include_router(endpoints.quotation_router)
+    app.include_router(endpoints.converter_router)
     return app
 
 

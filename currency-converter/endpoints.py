@@ -13,6 +13,7 @@ from .services import CurrencyService, CurrencyQuotationService
 
 currency_router = APIRouter(tags=['currency'])
 quotation_router = APIRouter(tags=['currency_quotation'])
+converter_router = APIRouter(tags=['converter'])
 
 
 @currency_router.get('/currencies', response_model=Optional[List[CurrencyOut]])
@@ -144,7 +145,7 @@ def remove(
         return Response(status_code=status.HTTP_204_NO_CONTENT)
 
 
-@quotation_router.post('/currencies/converter', response_model=ConverterOut)
+@converter_router.post('/converter', response_model=ConverterOut)
 @inject
 def converter(
         converter: ConverterIn,
