@@ -87,8 +87,11 @@ class CurrencyQuotationRepository:
 
             return currency_quotation
 
-    def get_by_abb_and_date(self, currency_abb: str,
-                            date: Optional[date] = None) -> CurrencyQuotation:
+    def get_by_abb_and_date(
+            self,
+            currency_abb: str,
+            date: Optional[date] = None
+    ) -> CurrencyQuotation:
         with self.session_factory() as session:
             res = session.query(CurrencyQuotation, Currency) \
                 .join(Currency, Currency.id == CurrencyQuotation.currency_id)
@@ -127,8 +130,12 @@ class CurrencyQuotationRepository:
             except IntegrityError as e:
                 raise DataBaseIntegrityError(e)
 
-    def update_by_id(self, currency_id: int, quotation_id: int,
-                     currency_quotation: CurrencyQuotationIn) -> CurrencyQuotation:
+    def update_by_id(
+            self,
+            currency_id: int,
+            quotation_id: int,
+            currency_quotation: CurrencyQuotationIn
+    ) -> CurrencyQuotation:
         with self.session_factory() as session:
             entity: CurrencyQuotation = self.get_by_id(currency_id, quotation_id)
             entity.date = currency_quotation.date or f'{datetime.now():%Y-%m-%d}'
