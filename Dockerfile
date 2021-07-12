@@ -10,4 +10,4 @@ COPY . /code/
 RUN pip install --upgrade pip \
  && pip install -r requirements.txt
 
-CMD uvicorn currency-converter.application:app --host ${HOST} --port ${PORT}
+CMD uvicorn currency-converter.application:app --host ${HOST} --port ${PORT} --reload

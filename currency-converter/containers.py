@@ -3,8 +3,8 @@
 from dependency_injector import containers, providers
 
 from .database import Database
-from .repositories import CurrencyRepository
-from .services import CurrencyService
+from .repositories import CurrencyRepository, CurrencyQuotationRepository
+from .services import CurrencyService, CurrencyQuotationService
 
 
 class Container(containers.DeclarativeContainer):
@@ -20,4 +20,14 @@ class Container(containers.DeclarativeContainer):
     currency_service = providers.Factory(
         CurrencyService,
         currency_repository=currency_repository,
+    )
+
+    currency_quotation_repository = providers.Factory(
+        CurrencyQuotationRepository,
+        session_factory=db.provided.session,
+    )
+
+    currency_quotation_service = providers.Factory(
+        CurrencyQuotationService,
+        currency_quotation_repository=currency_quotation_repository,
     )

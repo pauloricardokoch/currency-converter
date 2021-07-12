@@ -4,27 +4,18 @@ from typing import Optional, List
 
 from dependency_injector.wiring import inject, Provide
 from fastapi import APIRouter, Depends, Response, status
-from pydantic import BaseModel, constr
+from fastapi.responses import PlainTextResponse
 
 from .containers import Container
-from .repositories import NotFoundError
-from .services import CurrencyService
-
-
-class Currency(BaseModel):
-    abb: constr(regex='^[A-Z]{3}$')
-    name: str
-    id: int
-
-
-class CurrencyList(BaseModel):
-    currencies: Optional[List[Currency]]
-
+from .dtos import CurrencyIn, CurrencyOut, CurrencyQuotationIn, CurrencyQuotationOut
+from .repositories import NotFoundError, DataBaseIntegrityError
+from .services import CurrencyService, CurrencyQuotationService
 
 currency_router = APIRouter(tags=['currency'])
+quotation_router = APIRouter(tags=['currency_quotation'])
 
 
-@currency_router.get('/currencies', response_model=CurrencyList)
+@currency_router.get('/currencies', response_model=Optional[List[CurrencyOut]])
 @inject
 def get_list(
         currency_service: CurrencyService = Depends(Provide[Container.currency_service]),
@@ -32,7 +23,7 @@ def get_list(
     return currency_service.get_currencies()
 
 
-@currency_router.get('/currencies/{currency_id}', response_model=Currency)
+@currency_router.get('/currencies/{currency_id}', response_model=CurrencyOut)
 @inject
 def get_by_id(
         currency_id: int,
@@ -44,13 +35,31 @@ def get_by_id(
         return Response(status_code=status.HTTP_404_NOT_FOUND)
 
 
-@currency_router.post('/currencies', status_code=status.HTTP_201_CREATED)
+@currency_router.post('/currencies', status_code=status.HTTP_201_CREATED, response_model=CurrencyOut)
 @inject
 def add(
-        currency: Currency,
+        currency: CurrencyIn,
         currency_service: CurrencyService = Depends(Provide[Container.currency_service]),
 ):
-    return currency_service.create_currency(currency.abb, currency.name)
+    try:
+        return currency_service.create_currency(currency)
+    except DataBaseIntegrityError as e:
+        return PlainTextResponse(str(e), status_code=status.HTTP_400_BAD_REQUEST)
+
+
+@currency_router.put('/currencies/{currency_id}', response_model=CurrencyOut)
+@inject
+def update(
+        currency_id: int,
+        currency: CurrencyIn,
+        currency_service: CurrencyService = Depends(Provide[Container.currency_service]),
+):
+    try:
+        return currency_service.update_currency(currency_id, currency)
+    except DataBaseIntegrityError as e:
+        return PlainTextResponse(str(e), status_code=400)
+    except NotFoundError:
+        return Response(status_code=status.HTTP_404_NOT_FOUND)
 
 
 @currency_router.delete('/currencies/{currency_id}', status_code=status.HTTP_204_NO_CONTENT)
@@ -67,6 +76,66 @@ def remove(
         return Response(status_code=status.HTTP_204_NO_CONTENT)
 
 
-@currency_router.get('/status')
-def get_status():
-    return {'status': 'OK'}
+@quotation_router.get('/currencies/{currency_id}/quotations',
+                      response_model=Optional[List[CurrencyQuotationOut]])
+@inject
+def get_list(
+        currency_id: int,
+        currency_quotation_service: CurrencyQuotationService = Depends(Provide[Container.currency_quotation_service]),
+):
+    return currency_quotation_service.get_currency_quotations(currency_id)
+
+
+@quotation_router.get('/currencies/{currency_id}/quotations/{quotation_id}', response_model=CurrencyQuotationOut)
+@inject
+def get_by_id(
+        currency_id: int,
+        quotation_id: int,
+        currency_quotation_service: CurrencyQuotationService = Depends(Provide[Container.currency_quotation_service]),
+):
+    try:
+        return currency_quotation_service.get_currency_quotation_by_id(currency_id, quotation_id)
+    except NotFoundError:
+        return Response(status_code=status.HTTP_404_NOT_FOUND)
+
+
+@quotation_router.post('/currencies/{currency_id}/quotations', status_code=status.HTTP_201_CREATED,
+                       response_model=CurrencyQuotationOut)
+@inject
+def add(
+        currency_id: int,
+        currency_quotation: CurrencyQuotationIn,
+        currency_quotation_service: CurrencyQuotationService = Depends(Provide[Container.currency_quotation_service]),
+):
+    try:
+        return currency_quotation_service.create_currency_quotation(currency_id, currency_quotation)
+    except DataBaseIntegrityError as e:
+        return PlainTextResponse(str(e), status_code=400)
+
+# @quotation_router.put('/currencies/{currency_id}', response_model=CurrencyOut)
+# @inject
+# def update(
+#         currency_id: int,
+#         currency: CurrencyIn,
+#         currency_service: CurrencyService = Depends(Provide[Container.currency_service]),
+# ):
+#     try:
+#         return currency_service.update_currency(currency_id, currency)
+#     except DataBaseIntegrityError as e:
+#         return PlainTextResponse(str(e), status_code=400)
+#     except NotFoundError:
+#         return Response(status_code=status.HTTP_404_NOT_FOUND)
+#
+#
+# @quotation_router.delete('/currencies/{currency_id}', status_code=status.HTTP_204_NO_CONTENT)
+# @inject
+# def remove(
+#         currency_id: int,
+#         currency_service: CurrencyService = Depends(Provide[Container.currency_service]),
+# ):
+#     try:
+#         currency_service.delete_currency_by_id(currency_id)
+#     except NotFoundError:
+#         return Response(status_code=status.HTTP_404_NOT_FOUND)
+#     else:
+#         return Response(status_code=status.HTTP_204_NO_CONTENT)
