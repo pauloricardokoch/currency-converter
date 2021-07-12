@@ -86,7 +86,6 @@ class CurrencyQuotationRepository:
                            date: Optional[date] = None) -> CurrencyQuotation:
         with self.session_factory() as session:
             res = session.query(CurrencyQuotation)
-
             res = res.filter(CurrencyQuotation.currency_id == currency_id)
 
             if date is not None:
