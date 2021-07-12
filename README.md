@@ -1,12 +1,15 @@
 # Currency converter
 
-## Build
+### Build
 ```
 docker-compose build
 ```
 
 
-## Start
+### Start
 ```
 docker-compose up
 ```
+
+### API
+(http://localhost:8000/docs)
