@@ -82,8 +82,8 @@ class CurrencyQuotationRepository:
 
             return currency_quotation
 
-    def get_by_id_and_date(self, currency_abb: str,
-                           date: Optional[date] = None) -> CurrencyQuotation:
+    def get_by_abb_and_date(self, currency_abb: str,
+                            date: Optional[date] = None) -> CurrencyQuotation:
         with self.session_factory() as session:
             res = session.query(CurrencyQuotation, Currency) \
                 .join(Currency, Currency.id == CurrencyQuotation.currency_id)

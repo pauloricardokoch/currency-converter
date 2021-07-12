@@ -84,7 +84,7 @@ class CurrencyConverterService:
         self._repository: CurrencyQuotationRepository = currency_quotation_repository
 
     def _get_quotation(self, currency_abb: str, date: Optional[datetime.date]):
-        quotation = self._repository.get_by_id_and_date(currency_abb, date)
+        quotation = self._repository.get_by_abb_and_date(currency_abb, date)
         return CurrencyQuotationOut(id=quotation.id,
                                     currency_id=quotation.currency_id,
                                     exchange_rate=quotation.exchange_rate,
