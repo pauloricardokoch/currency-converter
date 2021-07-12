@@ -25,12 +25,6 @@ class Database:
             ),
         )
 
-    def _event(self):
-        def _fk_pragma_on_connect(dbapi_con, con_record):
-            dbapi_con.execute('pragma foreign_keys=ON')
-
-        event.listen(self._engine, 'connect', _fk_pragma_on_connect)
-
     def create_database(self) -> None:
         Base.metadata.create_all(self._engine)
 
@@ -45,3 +39,10 @@ class Database:
             raise
         finally:
             session.close()
+
+    def _event(self):
+        event.listen(self._engine, 'connect', self._fk_pragma_on_connect)
+
+    @staticmethod
+    def _fk_pragma_on_connect(dbapi_con, con_record):
+        dbapi_con.execute('pragma foreign_keys=ON')
