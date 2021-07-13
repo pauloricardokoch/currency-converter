@@ -13,7 +13,10 @@ from .models import Currency, CurrencyQuotation
 
 
 class CurrencyRepository:
-    def __init__(self, session_factory: Callable[..., AbstractContextManager[Session]]) -> None:
+    def __init__(
+            self, session_factory: Callable[
+                ..., AbstractContextManager[Session]]
+    ) -> None:
         self.session_factory = session_factory
 
     def get_all(self) -> Iterator[Currency]:
@@ -22,9 +25,9 @@ class CurrencyRepository:
 
     def get_by_id(self, currency_id: int) -> Currency:
         with self.session_factory() as session:
-            currency = session.query(Currency) \
-                .filter(Currency.id == currency_id) \
-                .first()
+            currency = session.query(Currency).filter(
+                Currency.id == currency_id
+            ).first()
 
             if not currency:
                 raise NotFoundError(CurrencyRepository.__name__)
@@ -67,20 +70,26 @@ class CurrencyRepository:
 
 
 class CurrencyQuotationRepository:
-    def __init__(self, session_factory: Callable[..., AbstractContextManager[Session]]) -> None:
+    def __init__(
+            self, session_factory: Callable[
+                ..., AbstractContextManager[Session]]
+    ) -> None:
         self.session_factory = session_factory
 
     def get_all(self, currency_id: int) -> Iterator[CurrencyQuotation]:
         with self.session_factory() as session:
-            return session.query(CurrencyQuotation) \
-                .filter(CurrencyQuotation.currency_id == currency_id) \
-                .all()
+            return session.query(CurrencyQuotation).filter(
+                CurrencyQuotation.currency_id == currency_id
+            ).all()
 
-    def get_by_id(self, currency_id: int, quotation_id: int) -> CurrencyQuotation:
+    def get_by_id(
+            self, currency_id: int, quotation_id: int
+    ) -> CurrencyQuotation:
         with self.session_factory() as session:
-            currency_quotation = session.query(CurrencyQuotation) \
-                .filter(CurrencyQuotation.currency_id == currency_id, CurrencyQuotation.id == quotation_id) \
-                .first()
+            currency_quotation = session.query(CurrencyQuotation).filter(
+                CurrencyQuotation.currency_id == currency_id,
+                CurrencyQuotation.id == quotation_id
+            ).first()
 
             if not currency_quotation:
                 raise NotFoundError(CurrencyQuotationRepository.__name__)
@@ -93,17 +102,16 @@ class CurrencyQuotationRepository:
             date: Optional[date] = None
     ) -> CurrencyQuotation:
         with self.session_factory() as session:
-            res = session.query(CurrencyQuotation, Currency) \
-                .join(Currency, Currency.id == CurrencyQuotation.currency_id)
+            res = session.query(CurrencyQuotation, Currency).join(
+                Currency, Currency.id == CurrencyQuotation.currency_id
+            )
 
             res = res.filter(Currency.abb == currency_abb)
 
             if date is not None:
                 res = res.filter(CurrencyQuotation.date <= date)
 
-            res = res.order_by(desc(CurrencyQuotation.date)) \
-                .limit(1) \
-                .first()
+            res = res.order_by(desc(CurrencyQuotation.date)).limit(1).first()
 
             if res is None:
                 raise NotFoundError(CurrencyQuotationRepository.__name__)
@@ -115,7 +123,9 @@ class CurrencyQuotationRepository:
                 date=res.CurrencyQuotation.date,
             )
 
-    def add(self, currency_id: int, currency_quotation: CurrencyQuotationIn) -> CurrencyQuotation:
+    def add(
+            self, currency_id: int, currency_quotation: CurrencyQuotationIn
+    ) -> CurrencyQuotation:
         with self.session_factory() as session:
             currency_quotation = CurrencyQuotation(
                 currency_id=currency_id,
@@ -139,8 +149,12 @@ class CurrencyQuotationRepository:
             currency_quotation: CurrencyQuotationIn
     ) -> CurrencyQuotation:
         with self.session_factory() as session:
-            entity: CurrencyQuotation = self.get_by_id(currency_id, quotation_id)
-            entity.date = currency_quotation.date or f'{datetime.now():%Y-%m-%d}'
+            entity: CurrencyQuotation = self.get_by_id(
+                currency_id, quotation_id
+            )
+
+            current_date = f'{datetime.now():%Y-%m-%d}'
+            entity.date = currency_quotation.date or current_date
             entity.exchange_rate = currency_quotation.exchange_rate
 
             try:
@@ -154,7 +168,9 @@ class CurrencyQuotationRepository:
 
     def delete_by_id(self, currency_id: int, quotation_id: int) -> None:
         with self.session_factory() as session:
-            entity: CurrencyQuotation = self.get_by_id(currency_id, quotation_id)
+            entity: CurrencyQuotation = self.get_by_id(
+                currency_id, quotation_id
+            )
             session.delete(entity)
             session.commit()
 

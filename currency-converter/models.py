@@ -1,6 +1,9 @@
 """Models module."""
 
-from sqlalchemy import Column, String, Integer, Float, ForeignKeyConstraint, Date, UniqueConstraint
+from sqlalchemy import (
+    Column, String, Integer, Float, ForeignKeyConstraint,
+    Date, UniqueConstraint
+)
 
 from .database import Base
 

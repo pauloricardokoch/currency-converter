@@ -4,7 +4,10 @@ from dependency_injector import containers, providers
 
 from .database import Database
 from .repositories import CurrencyRepository, CurrencyQuotationRepository
-from .services import CurrencyService, CurrencyQuotationService, CurrencyConverterService
+from .services import (
+    CurrencyService, CurrencyQuotationService,
+    CurrencyConverterService
+)
 
 
 class Container(containers.DeclarativeContainer):
