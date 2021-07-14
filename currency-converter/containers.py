@@ -32,10 +32,10 @@ class Container(containers.DeclarativeContainer):
 
     currency_quotation_service = providers.Factory(
         CurrencyQuotationService,
-        currency_quotation_repository=currency_quotation_repository,
+        currency_quotation_repo=currency_quotation_repository,
     )
 
     currency_converter_service = providers.Factory(
         CurrencyConverterService,
-        currency_quotation_repository=currency_quotation_repository,
+        currency_quotation_repo=currency_quotation_repository,
     )

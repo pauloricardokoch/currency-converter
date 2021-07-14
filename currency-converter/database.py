@@ -15,7 +15,7 @@ Base = declarative_base()
 class Database:
     def __init__(self, db_url: str) -> None:
         self._engine = create_engine(db_url, echo=True)
-        self._event()
+        self._conf_fk()
         self._session_factory = orm.scoped_session(
             orm.sessionmaker(
                 autocommit=False,
@@ -40,7 +40,7 @@ class Database:
         finally:
             session.close()
 
-    def _event(self):
+    def _conf_fk(self):
         event.listen(self._engine, 'connect', self._fk_pragma_on_connect)
 
     @staticmethod

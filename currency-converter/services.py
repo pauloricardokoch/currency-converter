@@ -165,7 +165,7 @@ class CurrencyConverterService:
         )
 
         rate = quotation_from.exchange_rate / quotation_to.exchange_rate
-        value = converter.value * rate
+        value = round(converter.value * rate, 3)
 
         return ConverterOut(
             CurrencyQuotationFrom=quotation_from,
