@@ -61,7 +61,7 @@ def add(
         return currency_service.create_currency(currency)
     except DataBaseIntegrityError as e:
         return PlainTextResponse(
-            str(e), status_code=status.HTTP_400_BAD_REQUEST
+            str(e), status_code=status.HTTP_422_UNPROCESSABLE_ENTITY
         )
 
 
@@ -78,7 +78,7 @@ def update(
         return currency_service.update_currency(currency_id, currency)
     except DataBaseIntegrityError as e:
         return PlainTextResponse(
-            str(e), status_code=status.HTTP_400_BAD_REQUEST
+            str(e), status_code=status.HTTP_422_UNPROCESSABLE_ENTITY
         )
     except NotFoundError:
         return Response(status_code=status.HTTP_404_NOT_FOUND)
@@ -155,7 +155,7 @@ def add(
         )
     except DataBaseIntegrityError as e:
         return PlainTextResponse(
-            str(e), status_code=status.HTTP_400_BAD_REQUEST
+            str(e), status_code=status.HTTP_422_UNPROCESSABLE_ENTITY
         )
 
 
@@ -177,7 +177,7 @@ def update(
         )
     except DataBaseIntegrityError as e:
         return PlainTextResponse(
-            str(e), status_code=status.HTTP_400_BAD_REQUEST
+            str(e), status_code=status.HTTP_422_UNPROCESSABLE_ENTITY
         )
     except NotFoundError:
         return Response(status_code=status.HTTP_404_NOT_FOUND)
@@ -217,9 +217,7 @@ def converter(
         return currency_converter_service.convert_currency(converter_in)
     except DataBaseIntegrityError as e:
         return PlainTextResponse(
-            str(e), status_code=status.HTTP_400_BAD_REQUEST
+            str(e), status_code=status.HTTP_422_UNPROCESSABLE_ENTITY
         )
     except Exception as e:
-        return PlainTextResponse(
-            str(e), status_code=status.HTTP_400_BAD_REQUEST
-        )
+        raise
