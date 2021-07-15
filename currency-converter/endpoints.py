@@ -160,7 +160,8 @@ def add(
 
 
 @quotation_router.put(
-    '/currencies/{currency_id}/quotations/{quotation_id}', response_model=CurrencyQuotationOut
+    '/currencies/{currency_id}/quotations/{quotation_id}',
+    response_model=CurrencyQuotationOut
 )
 @inject
 def update(
