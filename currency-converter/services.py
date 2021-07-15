@@ -146,7 +146,7 @@ class CurrencyConverterService:
         try:
             return self._get_quotation(currency_abb, date)
         except NotFoundError:
-            raise Exception('QuotationFrom not found in the database')
+            raise NotFoundError('QuotationFrom not found in the database')
 
     def _get_quotation_to(
             self, currency_abb: str, date: Optional[datetime.date]
@@ -154,7 +154,7 @@ class CurrencyConverterService:
         try:
             return self._get_quotation(currency_abb, date)
         except NotFoundError:
-            raise Exception('QuotationTo not found in the database')
+            raise NotFoundError('QuotationTo not found in the database')
 
     def convert_currency(self, converter: ConverterIn) -> ConverterOut:
         quotation_from = self._get_quotation_from(

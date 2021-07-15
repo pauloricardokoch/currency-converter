@@ -99,7 +99,7 @@ class CurrencyQuotationRepository:
     def get_by_abb_and_date(
             self,
             currency_abb: str,
-            date: Optional[date] = None
+            date_in: Optional[date] = None
     ) -> CurrencyQuotation:
         with self.session_factory() as session:
             res = session.query(CurrencyQuotation, Currency).join(
@@ -108,8 +108,8 @@ class CurrencyQuotationRepository:
 
             res = res.filter(Currency.abb == currency_abb)
 
-            if date is not None:
-                res = res.filter(CurrencyQuotation.date <= date)
+            if date_in is not None:
+                res = res.filter(CurrencyQuotation.date <= date_in)
 
             res = res.order_by(desc(CurrencyQuotation.date)).limit(1).first()
 
@@ -130,7 +130,7 @@ class CurrencyQuotationRepository:
             currency_quotation = CurrencyQuotation(
                 currency_id=currency_id,
                 exchange_rate=currency_quotation.exchange_rate,
-                date=currency_quotation.date or f'{datetime.now():%Y-%m-%d}'
+                date=currency_quotation.date or date.today()
             )
 
             try:
@@ -153,7 +153,7 @@ class CurrencyQuotationRepository:
                 currency_id, quotation_id
             )
 
-            current_date = f'{datetime.now():%Y-%m-%d}'
+            current_date = date.today()
             entity.date = currency_quotation.date or current_date
             entity.exchange_rate = currency_quotation.exchange_rate
 

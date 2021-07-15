@@ -160,7 +160,7 @@ def add(
 
 
 @quotation_router.put(
-    '/currencies/{currency_id}/quotations', response_model=CurrencyQuotationOut
+    '/currencies/{currency_id}/quotations/{quotation_id}', response_model=CurrencyQuotationOut
 )
 @inject
 def update(
@@ -184,7 +184,7 @@ def update(
 
 
 @quotation_router.delete(
-    '/currencies/{currency_id}/quotations',
+    '/currencies/{currency_id}/quotations/{quotation_id}',
     status_code=status.HTTP_204_NO_CONTENT
 )
 @inject
@@ -215,9 +215,7 @@ def converter(
 ):
     try:
         return currency_converter_service.convert_currency(converter_in)
-    except DataBaseIntegrityError as e:
+    except NotFoundError as e:
         return PlainTextResponse(
-            str(e), status_code=status.HTTP_422_UNPROCESSABLE_ENTITY
+            str(e), status_code=status.HTTP_404_NOT_FOUND
         )
-    except Exception as e:
-        raise
