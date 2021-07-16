@@ -19,6 +19,8 @@ docker-compose up
 #### TODO
 
 - [X] Add PEP8 checker
+- [ ] Import data from Banco Central
+- [ ] Calculate exchange rates beforehand
 - [ ] Write tests / CI
 - [ ] Implement migrations
 - [ ] CD / Deploy on heroku
